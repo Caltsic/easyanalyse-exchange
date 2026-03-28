@@ -1,0 +1,34 @@
+{
+  "name": "easyanalyse-exchange-install",
+  "version": "0.1.0",
+  "description": "NPX installer for the EASYAnalyse exchange Codex skill.",
+  "type": "module",
+  "bin": {
+    "easyanalyse-exchange-install": "./bin/install.mjs"
+  },
+  "files": [
+    "SKILL.md",
+    "agents",
+    "assets",
+    "references",
+    "scripts",
+    "bin"
+  ],
+  "keywords": [
+    "codex",
+    "skill",
+    "easyanalyse",
+    "exchange"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Caltsic/easyanalyse-exchange.git"
+  },
+  "homepage": "https://github.com/Caltsic/easyanalyse-exchange",
+  "bugs": {
+    "url": "https://github.com/Caltsic/easyanalyse-exchange/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
