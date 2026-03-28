@@ -16,6 +16,7 @@ Typical tasks:
 - generate a new exchange JSON document
 - repair invalid or inconsistent circuit JSON
 - modify an existing document without breaking saveability
+- work with wire routing behavior, including automatic vs manual bend-point preservation
 - explain the contract and invariants to the user
 - compare schema, docs, and implementation behavior
 
@@ -29,7 +30,9 @@ Read only the files needed for the task, in this order:
 4. `easyanalyse-desktop/src/lib/document.ts`
 5. `easyanalyse-desktop/src/types/document.ts`
 6. `easyanalyse-desktop/src-tauri/src/commands.rs`
-7. the root-level `*.schema.json` file only when you need to compare exported docs with runtime schema
+7. `easyanalyse-desktop/src/lib/geometry.ts` when the task touches wire geometry, routing, path rendering, or bend-point preservation
+8. `easyanalyse-desktop/src/store/editorStore.ts` when the task touches editor-side route mutation defaults or save preparation
+9. the root-level `*.schema.json` file only when you need to compare exported docs with runtime schema
 
 Conflict policy:
 
@@ -52,7 +55,8 @@ If paths moved, search the workspace for:
 2. Read the schema and `exchange.md` before editing JSON.
 3. If the task changes persisted behavior or asks whether something can save, read `validation.rs` and `commands.rs`.
 4. If the task depends on frontend normalization or derived defaults, read `document.ts` and `types/document.ts`.
-5. When producing JSON, keep it normalized and saveable.
+5. If the task involves wire routing, exact bend points, or why a rendered route changed, read `geometry.ts` and `editorStore.ts`.
+6. When producing JSON, keep it normalized and saveable.
 
 ## Contract checklist
 
@@ -68,6 +72,10 @@ Always preserve these rules unless the authoritative sources changed:
 - Port anchor kind must match the component geometry type.
 - Wire endpoints reference only `port` or `node` via `{ entityType, refId }`.
 - `wire.route.kind = "polyline"` stores only intermediate `bendPoints`; do not repeat source or target points there.
+- Wire routing mode is persisted only under `extensions.easyanalyse.routing.mode`.
+- Missing `routing.mode` means `auto`.
+- In `auto` mode, `source` and `target` are authoritative and the local tool may recompute `route.kind` and `bendPoints` during load, edit, validation, and save.
+- In `manual` mode, stored user-specified polyline bend points should be preserved unless the user edits them again.
 - `annotation.target.entityType` can target `component`, `port`, `node`, or `wire`, not `document` or `annotation`.
 - Component rotation is persisted only under `extensions.easyanalyse.rotationDeg`.
 - `node.connectedWireIds` is derived from actual wire references and must be recomputed, then sorted.
@@ -84,6 +92,9 @@ When fixing broken JSON:
 - If an endpoint target is missing, either repair the reference to an existing entity or report the document as invalid; do not silently fabricate unrelated topology.
 - If a port was represented with free coordinates, convert it into a valid `anchor` for the owning geometry.
 - If a component has rotation, keep it only in `extensions.easyanalyse.rotationDeg`.
+- If a wire should keep exact user bend points, mark it `manual`.
+- If a wire is tool-routed or you are regenerating its path from endpoints, use `auto` or omit `routing.mode`.
+- Do not promise stable stored bend points in `auto` mode; the local tool may rewrite them.
 
 ## Saveability rule
 
@@ -108,5 +119,5 @@ When answering the user:
 
 - Be explicit about whether a statement came from schema, `exchange.md`, or implementation.
 - Call out inferred behavior as inference.
-- If you changed derived fields like `connectedWireIds`, sorting, or `updatedAt`, say so briefly.
+- If you changed derived fields like `connectedWireIds`, sorting, `updatedAt`, or auto-routed wire geometry, say so briefly.
 - If the user asks for JSON generation or repair, return saveable JSON rather than pseudocode unless they asked for explanation only.
