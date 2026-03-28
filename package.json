@@ -7,10 +7,7 @@
     "easyanalyse-exchange-install": "./bin/install.mjs"
   },
   "files": [
-    "SKILL.md",
-    "agents",
-    "assets",
-    "references",
+    "easyanalyse-exchange",
     "scripts",
     "bin"
   ],

@@ -5,7 +5,10 @@ description: Use when working in the EASYAnalyse project on the AI-native circui
 
 # EASYAnalyse Exchange
 
-Use this skill only for the EASYAnalyse repository and its persisted circuit exchange JSON.
+Use this skill for EASYAnalyse persisted circuit exchange JSON.
+
+This skill must remain useful even when the local EASYAnalyse repository files are not present.
+Treat the bundled references as the default contract source.
 
 ## Goal
 
@@ -20,9 +23,18 @@ Typical tasks:
 - explain the contract and invariants to the user
 - compare schema, docs, and implementation behavior
 
-## Authoritative sources
+## Bundled references
 
-Read only the files needed for the task, in this order:
+Read these first:
+
+1. `references/exchange-contract.md`
+2. `references/runtime-validation.md`
+
+These references are the self-contained contract for installed users.
+
+## Local project verification
+
+If the user is working inside the real EASYAnalyse repository, verify against local sources in this order:
 
 1. `easyanalyse-desktop/src-tauri/crates/easyanalyse-core/schema/ai-native-circuit-exchange.schema.json`
 2. `exchange.md`
@@ -36,6 +48,7 @@ Read only the files needed for the task, in this order:
 
 Conflict policy:
 
+- If bundled references conflict with verified local runtime sources, prefer the verified local runtime sources and mention the drift.
 - If `exchange.md` conflicts with the schema, the schema wins.
 - If the schema permits multiple shapes but the implementation normalizes or derives fields, follow the implementation for persisted output.
 - Treat save behavior in `commands.rs` and semantic validation in `validation.rs` as the final implementation truth.
@@ -51,16 +64,17 @@ If paths moved, search the workspace for:
 
 ## Fast workflow
 
-1. Confirm the workspace is the EASYAnalyse repo by locating `exchange.md` and `easyanalyse-desktop`.
-2. Read the schema and `exchange.md` before editing JSON.
-3. If the task changes persisted behavior or asks whether something can save, read `validation.rs` and `commands.rs`.
-4. If the task depends on frontend normalization or derived defaults, read `document.ts` and `types/document.ts`.
-5. If the task involves wire routing, exact bend points, or why a rendered route changed, read `geometry.ts` and `editorStore.ts`.
-6. When producing JSON, keep it normalized and saveable.
+1. Read `references/exchange-contract.md`.
+2. Read `references/runtime-validation.md`.
+3. If the workspace looks like the real EASYAnalyse repo, verify the relevant local files before claiming implementation-exact behavior.
+4. If the task changes persisted behavior or asks whether something can save, read local `validation.rs` and `commands.rs` when available.
+5. If the task depends on frontend normalization or derived defaults, read local `document.ts` and `types/document.ts` when available.
+6. If the task involves wire routing, exact bend points, or why a rendered route changed, read local `geometry.ts` and `editorStore.ts` when available.
+7. When producing JSON, keep it normalized and saveable.
 
 ## Contract checklist
 
-Always preserve these rules unless the authoritative sources changed:
+Always preserve these rules unless verified local runtime sources changed:
 
 - Top-level shape is one JSON document with `schemaVersion`, `document`, `canvas`, `components`, `ports`, `nodes`, `wires`, `annotations`, and optional `extensions`.
 - `components`, `ports`, `nodes`, `wires`, and `annotations` are top-level arrays. Do not nest ports under components.

@@ -6,7 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const SKILL_NAME = "easyanalyse-exchange";
-const COPYABLE_ENTRIES = ["SKILL.md", "agents", "assets", "references", "scripts"];
+const SKILL_SOURCE_DIR = "easyanalyse-exchange";
 
 function printHelp() {
   console.log(`Install the ${SKILL_NAME} skill into Codex.
@@ -85,6 +85,11 @@ function installSkill({ destRoot, force }) {
   const sourceRoot = packageRoot();
   const skillsRoot = path.resolve(destRoot || path.join(codexHome(), "skills"));
   const skillTarget = path.join(skillsRoot, SKILL_NAME);
+  const skillSource = path.join(sourceRoot, SKILL_SOURCE_DIR);
+
+  if (!fs.existsSync(path.join(skillSource, "SKILL.md"))) {
+    throw new Error(`Skill source is invalid: ${skillSource}`);
+  }
 
   if (fs.existsSync(skillTarget)) {
     if (!force) {
@@ -95,15 +100,7 @@ function installSkill({ destRoot, force }) {
     removeIfExists(skillTarget);
   }
 
-  fs.mkdirSync(skillTarget, { recursive: true });
-
-  for (const entry of COPYABLE_ENTRIES) {
-    const source = path.join(sourceRoot, entry);
-    if (!fs.existsSync(source)) {
-      continue;
-    }
-    copyRecursive(source, path.join(skillTarget, entry));
-  }
+  copyRecursive(skillSource, skillTarget);
 
   if (!fs.existsSync(path.join(skillTarget, "SKILL.md"))) {
     throw new Error("SKILL.md was not installed. Package contents are invalid.");
