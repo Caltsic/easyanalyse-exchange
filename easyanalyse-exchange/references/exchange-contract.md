@@ -64,6 +64,8 @@ Rules:
 
 - `units` is currently `px`.
 - coordinates are treated as absolute canvas-space coordinates.
+- canvas size should leave at least one grid cell of margin around placed components.
+- leave enough clear space between adjacent components for routing; 80 px is a good default minimum.
 
 ## 5. Components
 
@@ -77,6 +79,7 @@ Rules:
 
 - component `name` must be non-empty in persisted output
 - `geometry` is the authoritative persisted placement
+- geometry is an abstract bounding box; choose size proportional to conceptual complexity and port count
 - rotation is persisted only through `extensions.easyanalyse.rotationDeg`
 - missing `rotationDeg` means `0`
 
@@ -118,6 +121,7 @@ A node with fewer than 2 connected wires blocks save/export in the current contr
 Rules:
 
 - `serialNumber` must be non-empty in persisted output
+- meaningful net names are preferred when they are known
 - wire endpoints reference only `port` or `node` through `{ entityType, refId }`
 - `route.kind` is `straight` or `polyline`
 - for `polyline`, `bendPoints` contains only intermediate corners
@@ -155,6 +159,8 @@ Rules:
 - annotation target can reference only `component`, `port`, `node`, or `wire`
 - annotations cannot target `document`
 - annotations cannot target another annotation
+- use `signal` for electrical values, `note` for explanation, and `label` for short identifiers
+- signal annotations should include units or logic/waveform context when known
 
 ## 10. Global invariants
 

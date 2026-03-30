@@ -1,6 +1,6 @@
 ---
 name: easyanalyse-exchange
-description: Use when working in the EASYAnalyse project on the AI-native circuit exchange format, especially when the user mentions exchange.md, the schema, circuit JSON, components/ports/nodes/wires/annotations, or asks to generate, repair, modify, normalize, validate, or explain exchange documents for the desktop editor.
+description: Use when working on the EASYAnalyse circuit exchange format, especially for circuit JSON generation, repair, validation, spatial layout, component sizing, signal flow, annotations, and multi-level abstraction reasoning.
 ---
 
 # EASYAnalyse Exchange
@@ -19,7 +19,9 @@ Typical tasks:
 - generate a new exchange JSON document
 - repair invalid or inconsistent circuit JSON
 - modify an existing document without breaking saveability
+- plan canvas layout, component sizing, and signal flow
 - work with wire routing behavior, including automatic vs manual bend-point preservation
+- trace signals and annotate electrical behavior
 - explain the contract and invariants to the user
 - compare schema, docs, and implementation behavior
 
@@ -29,6 +31,7 @@ Read these first:
 
 1. `references/exchange-contract.md`
 2. `references/runtime-validation.md`
+3. `references/layout-and-analysis.md`
 
 These references are the self-contained contract for installed users.
 
@@ -66,11 +69,12 @@ If paths moved, search the workspace for:
 
 1. Read `references/exchange-contract.md`.
 2. Read `references/runtime-validation.md`.
-3. If the workspace looks like the real EASYAnalyse repo, verify the relevant local files before claiming implementation-exact behavior.
-4. If the task changes persisted behavior or asks whether something can save, read local `validation.rs` and `commands.rs` when available.
-5. If the task depends on frontend normalization or derived defaults, read local `document.ts` and `types/document.ts` when available.
-6. If the task involves wire routing, exact bend points, or why a rendered route changed, read local `geometry.ts` and `editorStore.ts` when available.
-7. When producing JSON, keep it normalized and saveable.
+3. If the task involves generation from scratch, spatial layout, abstraction choice, signal tracing, or annotation strategy, read `references/layout-and-analysis.md`.
+4. If the workspace looks like the real EASYAnalyse repo, verify the relevant local files before claiming implementation-exact behavior.
+5. If the task changes persisted behavior or asks whether something can save, read local `validation.rs` and `commands.rs` when available.
+6. If the task depends on frontend normalization or derived defaults, read local `document.ts` and `types/document.ts` when available.
+7. If the task involves wire routing, exact bend points, or why a rendered route changed, read local `geometry.ts` and `editorStore.ts` when available.
+8. When producing JSON, keep it normalized and saveable.
 
 ## Contract checklist
 
@@ -134,4 +138,5 @@ When answering the user:
 - Be explicit about whether a statement came from schema, `exchange.md`, or implementation.
 - Call out inferred behavior as inference.
 - If you changed derived fields like `connectedWireIds`, sorting, `updatedAt`, or auto-routed wire geometry, say so briefly.
+- If signal analysis depends on assumptions, state the assumptions explicitly.
 - If the user asks for JSON generation or repair, return saveable JSON rather than pseudocode unless they asked for explanation only.
